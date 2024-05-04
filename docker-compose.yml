@@ -1,0 +1,54 @@
+services:
+  chat-app-server:
+    container_name: chat-app-server
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    develop:
+      watch:
+        - action: rebuild
+          path: ./server
+    ports:
+      - 8000:3000
+    env_file:
+      - .env.local
+
+  chat-app-pgsql:
+    container_name: chat-app-pgsql
+    image: postgres:16-alpine
+    restart: always
+    env_file:
+      - .env.local
+    volumes:
+      - pgdata:/pgdata
+
+  chat-app-pgsql-interface:
+    container_name: chat-app-pgsql-interface
+    image: dpage/pgadmin4:8.6
+    restart: always
+    ports:
+      - 8080:80
+    env_file:
+      - .env.local
+
+  chat-app-mongo:
+    container_name: chat-app-mongo
+    image: mongo:7.0.8
+    restart: always
+    env_file:
+      - .env.local
+    volumes:
+      - mongodata:/data/db
+
+  chat-app-mongo-interface:
+    container_name: chat-app-messages-interface
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    env_file:
+      - .env.local
+
+volumes:
+  pgdata:
+  mongodata:
